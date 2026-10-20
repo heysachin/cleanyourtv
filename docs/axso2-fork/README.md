@@ -26,7 +26,7 @@ This branch is the reference launcher (v2.3) with two changes for one TV, a Xiao
    under a dark veil, starting with the one after the current wallpaper and changing every 2 minutes. With an
    empty folder or `dream_photos` false it is the plain clock over the glow. Pick "Clock" under Settings →
    Device Preferences → Screen saver, or
-   `adb shell settings put secure screensaver_components com.gathin.tvhome/.ClockDream`.
+   `adb shell settings put secure screensaver_components com.sdevs.tvhome/.ClockDream`.
 4. **Prayer times, calculated on the TV.** No network: the sun-position method used by most timetables, set to
    Bengaluru, Karachi method (Fajr and Isha 18°) and Hanafi Asr, checked against published Bengaluru times to
    within a minute (`PrayerTimesTest`). Home shows the current and next prayer with a countdown in a glass pill;

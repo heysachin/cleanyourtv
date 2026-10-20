@@ -4,7 +4,18 @@ set -euo pipefail
 cd "$(dirname "$0")"
 : "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.168.1.50 $0}"
 # macOS: java_home or Homebrew; Linux: the java on PATH.
-export JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home -v 17 2>/dev/null || { [ -d /opt/homebrew/opt/openjdk@17 ] && echo /opt/homebrew/opt/openjdk@17; } || java -XshowSettings:properties -version 2>&1 | awk '/java.home/ {print $3}')}"
+if [ -z "${JAVA_HOME:-}" ]; then
+  if /usr/libexec/java_home -v 17 >/dev/null 2>&1; then
+    JAVA_HOME="$(/usr/libexec/java_home -v 17)"
+  elif [ -d "/Applications/Android Studio.app/Contents/jbr/Contents/Home" ]; then
+    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+  elif [ -d /opt/homebrew/opt/openjdk@17 ]; then
+    JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+  else
+    JAVA_HOME="$(java -XshowSettings:properties -version 2>&1 | awk '/java.home/ {print $3}')"
+  fi
+  export JAVA_HOME
+fi
 # Android Studio's default SDK location on macOS, then on Linux, then Homebrew's command-line tools.
 export ANDROID_HOME="${ANDROID_HOME:-$(for d in ~/Library/Android/sdk ~/Android/Sdk; do [ -d "$d" ] && echo "$d" && break; done)}"
 export ANDROID_HOME="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}"
@@ -20,7 +31,7 @@ export MSYS_NO_PATHCONV=1
 # Only a launcher we recognise is accepted: the answer can also be Android's chooser ("android"),
 # the setup wizard, or another third-party launcher, none of which should be disabled by accident.
 # Pass STOCK_LAUNCHER=<package> to name it yourself, or STOCK_LAUNCHER=none to disable nothing.
-KNOWN_STOCK_LAUNCHERS="com.google.android.tvlauncher com.google.android.apps.tv.launcherx com.google.android.leanbacklauncher com.mitv.tvhome"
+KNOWN_STOCK_LAUNCHERS="com.google.android.tvlauncher com.google.android.apps.tv.launcherx com.google.android.leanbacklauncher com.mitv.tvhome com.gathin.tvhome"
 if [ -z "${STOCK_LAUNCHER:-}" ]; then
   HOME_PKG=$("$PY" -I ../tools/tv.py 'cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME' \
     | tail -n 1 | tr -d '\r' | cut -d/ -f1) || {
@@ -29,7 +40,7 @@ if [ -z "${STOCK_LAUNCHER:-}" ]; then
   case " $KNOWN_STOCK_LAUNCHERS " in
     *" $HOME_PKG "*) STOCK_LAUNCHER=$HOME_PKG ;;
     *)
-      if [ "$HOME_PKG" = com.gathin.tvhome ]; then
+      if [ "$HOME_PKG" = com.sdevs.tvhome ]; then
         STOCK_LAUNCHER=none; echo "Home already belongs to this launcher; nothing will be disabled."
       elif [ "$HOME_PKG" = android ]; then
         # Android's chooser: two or more launchers tie and no default is set, which is where a TV lands
@@ -74,7 +85,8 @@ esac
 # fails only prints an "Error:" line, and the stock launcher would be disabled anyway, leaving the TV
 # with no usable Home (#239). "Status: ok" from `am start -W` means the activity really came up;
 # the HOME resolution further down only names a component, it does not prove the activity starts.
-START_OUT=$("$PY" -I ../tools/tv.py 'am start -W -n com.gathin.tvhome/.MainActivity')
+"$PY" -I ../tools/tv.py 'pm enable --user 0 com.sdevs.tvhome' >/dev/null 2>&1 || true
+START_OUT=$("$PY" -I ../tools/tv.py 'am start -W -n com.sdevs.tvhome/.MainActivity')
 echo "$START_OUT"
 # Both halves matter: some builds answer "Status: ok" for a task that was merely brought to the
 # front, and an activity that cannot start still prints "Error: Activity not started".
@@ -83,11 +95,18 @@ if ! printf '%s' "$START_OUT" | grep -qF 'Status: ok' || printf '%s' "$START_OUT
   exit 1
 fi
 printf '%s\n' \
-  "pm grant com.gathin.tvhome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted" \
-  "pm grant com.gathin.tvhome android.permission.READ_EXTERNAL_STORAGE 2>/dev/null; echo storage-granted" \
-  "cmd package compile -m speed -f com.gathin.tvhome" \
+  "pm grant com.sdevs.tvhome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted" \
+  "pm grant com.sdevs.tvhome android.permission.READ_EXTERNAL_STORAGE 2>/dev/null; echo storage-granted" \
+  "pm grant com.sdevs.tvhome android.permission.READ_TV_LISTINGS 2>/dev/null; echo tv-listings-granted" \
+  "pm grant com.sdevs.tvhome com.android.providers.tv.permission.READ_EPG_DATA 2>/dev/null; echo epg-granted" \
+  "pm grant com.sdevs.tvhome com.android.providers.tv.permission.WRITE_EPG_DATA 2>/dev/null; echo epg-write-granted" \
+  "pm grant com.sdevs.tvhome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; echo secure-settings-granted" \
+  "pm enable --user 0 com.mitv.overseaservice 2>/dev/null; echo overseaservice-enabled" \
+  "pm enable --user 0 com.netflix.ninja 2>/dev/null; echo netflix-enabled" \
+  "pm enable --user 0 com.amazon.amazonvideo.livingroom 2>/dev/null; echo prime-enabled" \
+  "cmd package compile -m speed -f com.sdevs.tvhome" \
   "$DISABLE_STOCK" \
-  "cmd package set-home-activity --user 0 com.gathin.tvhome/.MainActivity" \
+  "cmd package set-home-activity --user 0 com.sdevs.tvhome/.MainActivity" \
   | "$PY" -I ../tools/tv.py --batch
 
 # Home's owner, or an empty string when the TV cannot be reached (pipefail would otherwise make a
@@ -131,7 +150,7 @@ rollback_home() {
 # stock launcher back if it is not ours.
 HOME_NOW=$(query_home)
 case "$HOME_NOW" in
-  com.gathin.tvhome/*) echo "Home now resolves to $HOME_NOW" ;;
+  com.sdevs.tvhome/*) echo "Home now resolves to $HOME_NOW" ;;
   *)
     if [ -z "$HOME_NOW" ]; then
       echo "ERROR: the TV stopped answering while Home was being switched, so the outcome is unknown." >&2
@@ -153,9 +172,9 @@ esac
 #   HOME_KEY_SERVICE=1    remotes whose Home button sends KEYCODE_ALL_APPS instead of HOME, e.g. Xiaomi
 #                         sticks: the key is routed to the launcher (HomeKeyService)
 enable_service() {   # appends to enabled_accessibility_services without dropping other services
-  svc=com.gathin.tvhome/.$1
+  svc=com.sdevs.tvhome/.$1
   "$PY" -I ../tools/tv.py "s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$1*) ;; null|'') settings put secure enabled_accessibility_services $svc ;; *) settings put secure enabled_accessibility_services \"\$s:$svc\" ;; esac; settings put secure accessibility_enabled 1; echo $1 enabled"
 }
+enable_service HomeKeyService
 if [ "${INPUT_KEY_SERVICE:-0}" = 1 ]; then enable_service InputKeyService; fi
-if [ "${HOME_KEY_SERVICE:-0}" = 1 ]; then enable_service HomeKeyService; fi
 echo "Installed. Press Home on the remote to see it."

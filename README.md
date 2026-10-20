@@ -1,20 +1,88 @@
-> **This is a personal fork** of [Gathin23/cleanyourtv](https://github.com/Gathin23/cleanyourtv) for one TV, a
-> Xiaomi MiTV-AXSO2 (Android TV 9). Branch `axso2-launcher` adds rotating wallpapers, a Wallpaper picker and an
-> eight-app dock. Everything below the line is the upstream README.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Gathin23/cleanyourtv/main/docs/banner.png" alt="CleanYourTV" width="800">
+</p>
 
-## Before and after on my Xiaomi MiTV-AXSO2
+# CleanYourTV — Custom Android TV Launcher (`com.sdevs.tvhome`)
+
+A hyper-clean, fluid, ad-free Android TV / Google TV home screen built for peak performance and aesthetics. Forked from [Gathin23/cleanyourtv](https://github.com/Gathin23/cleanyourtv) and [Alafazam/cleanyourtv](https://github.com/Alafazam/cleanyourtv), tailored and enhanced by [@heysachin](https://github.com/heysachin).
+
+Tested and optimized for **Xiaomi MiTV-AXSO2** (Android TV 9, MediaTek UHD), and compatible with Android TV 8+ and Google TV devices.
+
+---
+
+## 🌟 What's New & Tailored in this Build
+
+### 1. 📺 Top Shelf "Continue Watching" Row
+- **TvProvider Preview Integration**: Pulls preview and resume media directly from apps like **Nuvio** (`com.nuvio.tv`), **Stremio** (`com.stremio.one`), and other Leanback apps via Android's `TvProvider` (`READ_TV_LISTINGS`, `READ_EPG_DATA`).
+- **Rich Media Cards**: 16:9 thumbnail posters, episode & season info, playback progress bar, dynamic resume badge (`▶ RESUME`), and a luminous focus halo.
+- **Fluid Navigation**: Seamless horizontal scrolling with overflow cue indicator, nested scrolling, and DPAD focus hopping between Continue Watching, the App Dock, and the Menu Bar.
+
+### 2. 🎮 Remote Button Remapping
+- Intercepts dedicated remote buttons and redirects to preferred apps:
+  - **Netflix Button** ➔ **SmartTube** (`org.smarttube.stable`)
+  - **Prime Video Button** ➔ **Nuvio** (`com.nuvio.tv`)
+- Multi-layer capture combines intent filtering (`ButtonInterceptActivity`) with accessibility hardware scancode & window state routing (`HomeKeyService`), bypassing stock vendor overrides.
+
+### 3. ⚙️ App Management Menu (Long-Press Context Sheet)
+- Holding **OK / Center** on any app tile opens an action sheet:
+  - 📌 **Move to Front**: Pin favorite app to slot 1 in the dock.
+  - ⬅️ **Move Left** / ➡️ **Move Right**: Reorder tiles dynamically. Order persists automatically in `SharedPreferences`.
+  - ℹ️ **App Info**: Direct shortcut into Android system app settings (clear cache, storage, permissions).
+  - 🗑️ **Uninstall**: Direct system uninstallation dialog.
+
+### 4. 🖼️ Built-in Curated 4K Wallpaper Pack & Picker
+- **27 bundled wallpapers** included in `wallpapers/` (mountain lakes, misty forests, deep space, fuji morning, aurora lights, zen stones, and sunsets).
+- **Automatic rotation**: Cycles through `/sdcard/Wallpapers` every 30 minutes.
+- **Wallpaper Picker Tile**: On-screen tile in the grid lets you preview thumbnails and pick a wallpaper instantly.
+- **Photo Screensaver**: The built-in drifting Clock screensaver cycles through the wallpaper folder behind a dim veil.
+- **One-command upload**: Push all bundled wallpapers to your TV using `tools/push-wallpapers.sh`.
+
+### 5. 🪟 tvOS Frosted Glass Styling
+- Upgraded `glass_panel.xml` with deep dark vibrancy, specular light gradients, and glowing borders.
+- 8-column layout designed for modern widescreen TV viewing without intrusive dock bands.
+- Prayer times disabled by default for minimal, distraction-free viewing.
+
+### 6. 🚀 Automated Wi-Fi Build & Deployment
+- `launcher/build-and-install.sh` builds and pushes `com.sdevs.tvhome`.
+- Automatically detects Android Studio JBR / OpenJDK 17.
+- Automatically grants all necessary permissions (`ACCESS_FINE_LOCATION`, `READ_EXTERNAL_STORAGE`, `READ_TV_LISTINGS`, `READ_EPG_DATA`, `WRITE_EPG_DATA`, `WRITE_SECURE_SETTINGS`).
+- Sets up `HomeKeyService` accessibility service and verifies launcher handover.
+
+---
+
+## ⚡ Quick Start
+
+### 1. Build and install over Wi-Fi
+Set your TV's IP address and run:
+```bash
+TV_HOST=192.168.1.50 launcher/build-and-install.sh
+```
+
+### 2. Push the bundled 4K wallpapers
+```bash
+TV_HOST=192.168.1.50 tools/push-wallpapers.sh
+```
+
+### 3. Debloat stock ads (optional, for Xiaomi MiTV-AXSO2)
+```bash
+TV_HOST=192.168.1.50 tools/disable.sh examples/xiaomi-mitv-axso2/debloat.txt
+```
+
+---
+
+## Before and after on Xiaomi MiTV-AXSO2
 
 | Before: stock home | After: this launcher |
 |---|---|
-| ![Stock Google TV home with a sponsored Hero ad, a Sponsored by JioHotstar row and PatchWall](docs/axso2-fork/before-stock-home.jpg) | ![The launcher with a mosque photo as wallpaper and an eight-app dock](docs/axso2-fork/home.jpg) |
-| Sponsored banner, sponsored rows, Shop and Discover tabs | No ads or content rows; my eight apps in one row |
+| ![Stock Google TV home with a sponsored Hero ad, a Sponsored by JioHotstar row and PatchWall](docs/axso2-fork/before-stock-home.jpg) | ![The launcher with a photo wallpaper, Continue Watching shelf and app dock](docs/axso2-fork/home.jpg) |
+| Sponsored banner, sponsored rows, Shop and Discover tabs | No ads or content rows; your Continue Watching shelf and apps |
 
 | | Before | After |
 |---|---|---|
 | Free RAM | about 550 MB | about 850 MB |
 | Packages disabled (not uninstalled) | 0 | 33 ([list](https://github.com/Alafazam/cleanyourtv/blob/examples-xiaomi-mitv-axso2/examples/xiaomi-mitv-axso2/debloat.txt)) |
-| Home screen | Google's stock launcher and PatchWall | This launcher |
-| Wallpaper | None | 12 photos rotating every 30 minutes, picked from a tile |
+| Home screen | Google's stock launcher and PatchWall | This launcher (`com.sdevs.tvhome`) |
+| Wallpaper | None | 27 curated 4K photos rotating every 30 minutes, picked from a tile |
 
 | Wallpaper tile | Wallpaper pop-up |
 |---|---|
@@ -245,7 +313,7 @@ The install scripts ask the TV which launcher owns Home and only disable one the
 
 ## The launcher
 
-A small native Android TV app (`com.gathin.tvhome`, about 300 KB installed) in plain Java with
+A small native Android TV app (`com.sdevs.tvhome`, about 300 KB installed) in plain Java with
 AndroidX RecyclerView and nothing heavier. Built for sets with 1 GB of RAM: no blur, no video, no
 network, no background services. It needs JDK 17 and Android SDK platform 34 to build; on macOS,
 `brew install openjdk@17 android-commandlinetools` and `sdkmanager "platforms;android-34" "build-tools;34.0.0"`. On Linux
@@ -255,12 +323,12 @@ the install script finds `~/Android/Sdk` and the `java` on your PATH.
 - **On-TV launcher settings:** click Settings for the TV's system settings, or hold OK on Settings and choose Launcher settings to set 4, 5, 6 or 7 apps per row, turn animations on or off, and opt into advanced effects. The advanced option adds tile lift, icon zoom and smooth ambient-colour transitions; it may use more memory. Use Follow theme to clear on-TV choices. Pushing or resetting a theme also clears them.
 - **Change the default home:** Launcher settings and the optional Default-home tile (`show_home_settings_shortcut`) open Android's home picker. Choose the original launcher to stop using CleanYourTV as Home, or CleanYourTV to return. The original launcher must be enabled. If the install script disabled it, use the restore script below first. Some TVs provide no home picker.
 - **Themes** set the same keys plus a background colour and a wallpaper from a `config.json` pushed to the TV, no rebuild. Three ship in [`themes/`](themes/), documented there.
-- **Language** follows the TV: English, German, Spanish, Catalan, French, Russian, Serbian (Latin), Polish, Portuguese, Turkish, Arabic, Hebrew, Simplified Chinese, Thai. Android 13+ can set it for the launcher alone: `tools/tv.py 'cmd locale set-app-locales com.gathin.tvhome --locales ca'`.
+- **Language** follows the TV: English, German, Spanish, Catalan, French, Russian, Serbian (Latin), Polish, Portuguese, Turkish, Arabic, Hebrew, Simplified Chinese, Thai. Android 13+ can set it for the launcher alone: `tools/tv.py 'cmd locale set-app-locales com.sdevs.tvhome --locales ca'`.
   Hebrew places the menu buttons on the left and the date and clock on the right, with the greeting above the clock. The Clock screensaver right-aligns its date and time, and Hebrew dates include the month prefix ב (for example, 19 באוקטובר). Hebrew dock and app-grid rows start on the right, with matching left/right remote navigation. The Hebrew input selector places icons and labels on the right, status on the left, and aligns the dropdown with the Inputs button’s right edge. Other languages keep their original layouts.
   Russian includes the module-card approval and management screens and the VPN-off badge.
 - **Module cards** let any TV app declare its own tile (label, caption, glow). The launcher asks you once per app, Keep hidden by default, and remembers the answer for that app's signing key and card name. Hold OK on Settings and choose Module cards to change your mind. How to make one: [`docs/modules.md`](docs/modules.md); the contract: [`docs/specs/card.md`](docs/specs/card.md).
 - **Clock screensaver**: a drifting clock over the glow, so nothing burns in. Pick "Clock" in the TV's screensaver settings, or over ADB:
-  `tools/tv.py 'settings put secure screensaver_components com.gathin.tvhome/.ClockDream; settings put secure screensaver_enabled 1'`
+  `tools/tv.py 'settings put secure screensaver_components com.sdevs.tvhome/.ClockDream; settings put secure screensaver_enabled 1'`
 - **Remote keys**: an optional accessibility service keeps the remote's Input button working on Google TV (`INPUT_KEY_SERVICE=1` at install), another fixes sticks whose Home key sends ALL_APPS and opens Settings from the remote's gear button, even one Android does not map (`HOME_KEY_SERVICE=1`, scancodes or keycodes in `config.xml`).
 - **Navigation** is deliberate: Up and Down move one row, the top buttons never fall through to tiles and Down from them returns to the dock tile you came from, the last focused app is remembered, and installing or removing an app refreshes the tiles while Home is open.
 - **Artwork**: app banners load at xhdpi or better, so low-density TV UIs do not downsample them before the focus zoom.

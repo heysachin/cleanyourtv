@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/glass_panel"
+        android:paddingStart="26dp"
+        android:paddingEnd="26dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="18dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!-- Header: App Icon + Name + Package -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Frosted icon container -->
+            <FrameLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/dialog_icon_bg"
+                android:padding="7dp">
+
+                <ImageView
+                    android:id="@+id/dialogAppIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/dialogAppTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="19sp"
+                    android:fontFamily="@font/outfit_medium"
+                    android:letterSpacing="-0.01" />
+
+                <TextView
+                    android:id="@+id/dialogAppPkg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="#80FFFFFF"
+                    android:textSize="11.5sp"
+                    android:fontFamily="@font/outfit_regular"
+                    android:letterSpacing="0.01" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Subtle divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1AFFFFFF"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Container for dynamic modern option rows -->
+        <LinearLayout
+            android:id="@+id/dialogOptionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
+</FrameLayout>

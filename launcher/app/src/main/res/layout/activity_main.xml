@@ -6,7 +6,7 @@
     android:background="#FF000000">
 
     <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden). -->
-    <com.gathin.tvhome.SkyView
+    <com.sdevs.tvhome.SkyView
         android:id="@+id/sky"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,11 +27,21 @@
         android:layout_marginStart="68dp"
         android:alpha="0"
         android:textColor="#FFFFFFFF"
-        android:textSize="48sp"
+        android:textSize="28sp"
         android:fontFamily="@font/outfit_light"
         android:letterSpacing="-0.02"
         android:includeFontPadding="false"
         android:singleLine="true" />
+
+    <View
+        android:id="@+id/focusHolder"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_gravity="top|start"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="@android:color/transparent"
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -210,29 +220,157 @@
                 android:visibility="gone" />
         </RelativeLayout>
 
-        <!-- The wrapper clips at the grid's edge; the grid itself must not clip so scaled tiles can overflow their cells. -->
-        <FrameLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/mainScroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/grid"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="40dp"
-                android:clipToPadding="false"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:clipChildren="false"
-                android:overScrollMode="never"
-                android:scrollbars="none"
-                android:descendantFocusability="afterDescendants" />
-        </FrameLayout>
+                android:clipToPadding="false">
+
+                <!-- 1. Continue Watching Section (Top Shelf) -->
+                <LinearLayout
+                    android:id="@+id/cwSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="370dp"
+                    android:orientation="vertical"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:id="@+id/cwSectionTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CONTINUE WATCHING"
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="11.5sp"
+                            android:fontFamily="@font/outfit_medium"
+                            android:letterSpacing="0.14"
+                            android:textAllCaps="true" />
+
+                        <TextView
+                            android:id="@+id/cwSourceBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/cw_badge_bg"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="6dp"
+                            android:paddingTop="1dp"
+                            android:paddingBottom="1.5dp"
+                            android:text="NUVIO"
+                            android:textColor="#FFA5B4FC"
+                            android:textSize="8.5sp"
+                            android:fontFamily="@font/outfit_medium"
+                            android:letterSpacing="0.08" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipChildren="false"
+                        android:clipToPadding="false">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/cwShelf"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="16dp"
+                            android:clipToPadding="false"
+                            android:clipChildren="false"
+                            android:overScrollMode="never"
+                            android:scrollbars="none"
+                            android:descendantFocusability="afterDescendants" />
+
+                        <!-- Right edge fade gradient with intuitive arrow cue for the 5th peeking tile -->
+                        <FrameLayout
+                            android:id="@+id/cwRightCue"
+                            android:layout_width="88dp"
+                            android:layout_height="124dp"
+                            android:layout_gravity="end|top"
+                            android:background="@drawable/cw_right_fade"
+                            android:clickable="false"
+                            android:focusable="false">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical|end"
+                                android:layout_marginEnd="6dp"
+                                android:text="›"
+                                android:textColor="#E6FFFFFF"
+                                android:textSize="32sp"
+                                android:fontFamily="@font/outfit_light"
+                                android:includeFontPadding="false" />
+                        </FrameLayout>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 2. Apps & Favorites Section (Revealed when scrolling down) -->
+                <LinearLayout
+                    android:id="@+id/appsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:orientation="vertical"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <TextView
+                        android:id="@+id/appsSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APPS"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="11.5sp"
+                        android:fontFamily="@font/outfit_medium"
+                        android:letterSpacing="0.14"
+                        android:textAllCaps="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="6dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="40dp"
+                        android:clipToPadding="false"
+                        android:clipChildren="false"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        android:descendantFocusability="afterDescendants" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
     <!-- The single floating glass highlight that springs between tiles. -->
-    <com.gathin.tvhome.GlassView
+    <com.sdevs.tvhome.GlassView
         android:id="@+id/glass"
         android:layout_width="10dp"
         android:layout_height="10dp"

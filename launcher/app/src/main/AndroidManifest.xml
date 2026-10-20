@@ -7,6 +7,7 @@
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- Needed since Android 10 to read the Wi-Fi network name for the network pill. Never requested at
@@ -16,6 +17,18 @@
         tools:ignore="CoarseFineLocation" />
     <!-- Reads the pictures in the wallpaper folder (config.xml, wallpaper_folder); granted over adb at install time. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- TV channel and continue-watching access for Nuvio and Leanback channels -->
+    <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.ACCESS_ALL_EPG_DATA" />
+    <uses-permission android:name="com.android.providers.tv.permission.ACCESS_WATCHED_PROGRAMS" />
+    <!-- Required since targetSdk 28+ to launch the system uninstall confirmation dialog. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Android 11+ (API 30+) full package visibility for custom TV launcher to see all installed apps -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->
@@ -24,9 +37,23 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
         </intent>
+        <!-- Also discover apps that only declare LAUNCHER (sideloaded / non-TV apps). -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
-            <category android:name="com.gathin.tvhome.category.DOCK_CARD" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="com.sdevs.tvhome.category.DOCK_CARD" />
+        </intent>
+        <!-- Needed for the Uninstall option in the long-press menu (ACTION_DELETE). -->
+        <intent>
+            <action android:name="android.intent.action.DELETE" />
+            <data android:scheme="package" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+            <data android:scheme="package" />
         </intent>
         <!-- China-market MIUI TV firmware: the Settings and Wi-Fi pills fall back to Xiaomi's settings app. -->
         <package android:name="com.xiaomi.mitv.settings" />
@@ -84,6 +111,22 @@
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay" />
+
+        <!-- Remote button interceptor: routes Netflix button to SmartTube and Prime Video to Nuvio -->
+        <activity
+            android:name=".ButtonInterceptActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true">
+            <intent-filter android:priority="999">
+                <action android:name="com.netflix.action.NETFLIX_KEY_START" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter android:priority="999">
+                <action android:name="com.amazon.amazonvideo.livingroom.AMAZON_BUTTON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <!-- Home button for remotes that send KEYCODE_ALL_APPS (Xiaomi). Opt-in: HOME_KEY_SERVICE=1
              build-and-install.sh; see HomeKeyService. -->
         <service
@@ -100,7 +143,7 @@
         </service>
 
         <!-- Screensaver: pick it in Settings, or `settings put secure screensaver_components
-             com.gathin.tvhome/.ClockDream` over adb. -->
+             com.sdevs.tvhome/.ClockDream` over adb. -->
         <service
             android:name=".ClockDream"
             android:label="@string/dream_name"
