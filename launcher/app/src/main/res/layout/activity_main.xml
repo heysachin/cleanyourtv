@@ -218,6 +218,28 @@
                 android:fontFamily="@font/outfit_regular"
                 android:letterSpacing="0.02"
                 android:visibility="gone" />
+
+            <!-- Google Calendar upcoming event chip under the clock and buttons. -->
+            <TextView
+                android:id="@+id/calendarChip"
+                style="@style/TopButtonBase"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_below="@id/leftBlock"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="4dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="16dp"
+                android:maxWidth="520dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="13sp"
+                android:fontFamily="@font/outfit_medium"
+                android:drawableStart="@drawable/ic_calendar"
+                android:drawablePadding="8dp"
+                android:focusable="true"
+                android:clickable="true"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <androidx.core.widget.NestedScrollView

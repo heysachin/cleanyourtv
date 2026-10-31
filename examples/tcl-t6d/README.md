@@ -30,7 +30,8 @@
 4. **Ad-Blocking Private DNS**:
    - Configured `dns.adguard-dns.com` system-wide.
 5. **Installed heysachin Custom Launcher (`com.sdevs.tvhome`)**:
-   - Built and installed `com.sdevs.tvhome` (355 KB, targetSdk 34).
+   - Built and installed `com.sdevs.tvhome` (363 KB, targetSdk 34).
+   - Native Google Calendar integration: live upcoming agenda chip under the clock and frosted today's schedule modal sheet reading directly from Android's `CalendarContract`.
    - 31 curated 4K wallpapers uploaded to `/sdcard/Wallpapers` with 30-minute auto-rotation and dim-veil Clock screensaver.
    - Android 14 Scoped Storage support via `MANAGE_EXTERNAL_STORAGE` and app-specific storage fallback (`WallpaperFolder.java`).
    - Live Continue Watching top shelf integrating directly with Leanback TvProvider and Nuvio.

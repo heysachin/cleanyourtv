@@ -20,6 +20,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+    <!-- Google Calendar integration: read upcoming events for home screen agenda chip -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- TV channel and continue-watching access for Nuvio and Leanback channels -->
     <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
     <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />

@@ -136,4 +136,7 @@
     <integer name="hijri_offset_days">0</integer>
     <!-- Show the prayer view in the Clock screensaver. -->
     <bool name="dream_prayer">false</bool>
+
+    <!-- Google Calendar integration: show upcoming event chip under the clock and day agenda dialog. -->
+    <bool name="calendar_chip">true</bool>
 </resources>

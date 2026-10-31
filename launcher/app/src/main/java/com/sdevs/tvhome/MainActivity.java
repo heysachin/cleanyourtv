@@ -20,6 +20,10 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.ContentObserver;
+import android.provider.CalendarContract;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
@@ -111,6 +115,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private TextView greeting;
     private View btnInputs;
     private TextView btnWifi;
+    private TextView calendarChip;
+    private ContentObserver calendarObserver;
+    private boolean calendarEnabled = true;
+    private static final int CALENDAR_PERMISSION_REQUEST = 102;
     private TextView shamsiDate;
     private boolean shamsi;
     /** Optional time-of-day backdrop (config.xml, sky_intensity); 0 keeps it hidden. */
@@ -250,6 +258,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             updatePrayerLine();
             updateWifiLabel();
             updateWallpaper();
+            updateCalendarChip();
             sky.update();
             handler.postDelayed(this, MINUTE_MS);
         }
@@ -410,6 +419,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return true;
             if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                if (calendarChip != null && calendarChip.getVisibility() == View.VISIBLE) {
+                    calendarChip.requestFocus();
+                    return true;
+                }
                 if (cwSection != null && cwSection.getVisibility() == View.VISIBLE && cwAdapter != null && cwAdapter.getItemCount() > 0) {
                     focusCwCard(lastCwFocused);
                 } else {
@@ -418,6 +431,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 return true;
             }
             int firstButton = (btnInputs != null && btnInputs.getVisibility() == View.VISIBLE) ? R.id.btnInputs : R.id.btnWifi;
+            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT && v.getId() == firstButton) {
+                if (calendarChip != null && calendarChip.getVisibility() == View.VISIBLE) {
+                    calendarChip.requestFocus();
+                    return true;
+                }
+                return true;
+            }
             int leftButton = rtlMenuBar ? R.id.btnSettings : firstButton;
             int rightButton = rtlMenuBar ? firstButton : R.id.btnSettings;
             if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return v.getId() == leftButton;
@@ -426,6 +446,41 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
+
+        calendarEnabled = cfg.calendarChip;
+        calendarChip = findViewById(R.id.calendarChip);
+        if (calendarChip != null) {
+            calendarChip.setOnClickListener(v -> {
+                if (!CalendarHelper.hasPermission(this)) {
+                    requestPermissions(new String[]{Manifest.permission.READ_CALENDAR}, CALENDAR_PERMISSION_REQUEST);
+                } else {
+                    CalendarDayDialog.show(this);
+                }
+            });
+            calendarChip.setOnKeyListener((v, keyCode, event) -> {
+                if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+                if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                    View first = (btnInputs != null && btnInputs.getVisibility() == View.VISIBLE) ? btnInputs : btnWifi;
+                    if (first != null) first.requestFocus();
+                    return true;
+                }
+                if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    if (cwSection != null && cwSection.getVisibility() == View.VISIBLE && cwAdapter != null && cwAdapter.getItemCount() > 0) {
+                        focusCwCard(lastCwFocused);
+                    } else {
+                        focusTile(lastFocused % COLUMNS);
+                    }
+                    return true;
+                }
+                return false;
+            });
+            if (advancedEffects) {
+                calendarChip.setOnFocusChangeListener((view, focused) -> view.animate()
+                        .scaleX(focused ? 1.04f : 1f).scaleY(focused ? 1.04f : 1f)
+                        .setDuration(160).start());
+            }
+        }
+        registerCalendarObserver();
 
         View focusHolder = findViewById(R.id.focusHolder);
         if (focusHolder != null) {
@@ -440,6 +495,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                     return true;
                 }
                 if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                    if (calendarChip != null && calendarChip.getVisibility() == View.VISIBLE) {
+                        calendarChip.requestFocus();
+                        return true;
+                    }
                     View first = (btnInputs != null && btnInputs.getVisibility() == View.VISIBLE) ? btnInputs : btnWifi;
                     if (first != null) first.requestFocus();
                     return true;
@@ -572,6 +631,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         updateWallpaper();
         sky.update();
         loadContinueWatching();
+        updateCalendarChip();
         handler.postDelayed(minuteTick, MINUTE_MS);
     }
 
@@ -686,7 +746,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         View focused = getCurrentFocus();
         if (focused != null && focused.getId() != R.id.focusHolder && focused != root) {
             int id = focused.getId();
-            if (id == R.id.card || id == R.id.btnInputs || id == R.id.btnWifi || id == R.id.btnSettings) {
+            if (id == R.id.card || id == R.id.btnInputs || id == R.id.btnWifi || id == R.id.btnSettings || id == R.id.calendarChip) {
                 return false;
             }
         }
@@ -751,10 +811,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             cm.unregisterNetworkCallback(networkCallback);
             cm.unregisterNetworkCallback(vpnCallback);
         }
+        if (calendarObserver != null) {
+            try {
+                getContentResolver().unregisterContentObserver(calendarObserver);
+            } catch (Exception ignored) {}
+        }
     }
 
     @Override
     public void onBackPressed() {
+        if (calendarChip != null && calendarChip.isFocused()) {
+            resetToHeroResting();
+            return;
+        }
         if (!isAtHeroResting()) {
             resetToHeroResting();
             return;
@@ -887,6 +956,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         public boolean onCwTileKey(int position, int keyCode, KeyEvent event) {
             if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
             if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                if (calendarChip != null && calendarChip.getVisibility() == View.VISIBLE) {
+                    calendarChip.requestFocus();
+                    return true;
+                }
                 resetToHeroResting();
                 return true;
             }
@@ -1176,6 +1249,63 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             prayerLine.setText("\u2600 Sunrise " + sr + "  \u00B7  \u263E Sunset " + ss);
         }
         prayerLine.setVisibility(View.VISIBLE);
+    }
+
+    private void registerCalendarObserver() {
+        if (!calendarEnabled) return;
+        try {
+            calendarObserver = new ContentObserver(handler) {
+                @Override
+                public void onChange(boolean selfChange) {
+                    updateCalendarChip();
+                }
+            };
+            getContentResolver().registerContentObserver(
+                    CalendarContract.Events.CONTENT_URI, true, calendarObserver);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void updateCalendarChip() {
+        if (!calendarEnabled || calendarChip == null) {
+            if (calendarChip != null) calendarChip.setVisibility(View.GONE);
+            return;
+        }
+        if (!CalendarHelper.hasPermission(this)) {
+            calendarChip.setText("\uD83D\uDCC5 Connect Calendar");
+            calendarChip.setVisibility(View.VISIBLE);
+            return;
+        }
+        new Thread(() -> {
+            List<CalendarHelper.Event> events = CalendarHelper.getTodayEvents(MainActivity.this);
+            long now = System.currentTimeMillis();
+            CalendarHelper.Event next = CalendarHelper.getNextOrCurrentEvent(events, now);
+            String text;
+            if (next != null) {
+                text = CalendarHelper.formatChipText(MainActivity.this, next, now);
+            } else if (!events.isEmpty()) {
+                text = "\u2728 All done for today";
+            } else {
+                text = "\uD83D\uDCC5 No events today";
+            }
+
+            runOnUiThread(() -> {
+                if (calendarChip != null) {
+                    calendarChip.setText(text);
+                    calendarChip.setVisibility(View.VISIBLE);
+                }
+            });
+        }).start();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CALENDAR_PERMISSION_REQUEST && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            updateCalendarChip();
+            CalendarDayDialog.show(this);
+        }
     }
 
     private void updateGreeting() {

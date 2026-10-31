@@ -23,7 +23,13 @@ Tested and optimized for **TCL T6D** (Android 14 Google TV, Realtek G14) and **X
   - **Prime Video Button** ➔ **Nuvio** (`com.nuvio.tv`)
 - Multi-layer capture combines intent filtering (`ButtonInterceptActivity`) with accessibility hardware scancode & window state routing (`HomeKeyService`), bypassing stock vendor overrides.
 
-### 3. 🖼️ Built-in Curated 4K Wallpaper Pack & Picker
+### 3. 📅 Native Google Calendar Integration
+- **Live Agenda Chip**: Renders the next upcoming event right beneath the clock (e.g. `📅 19:00 · 🧘‍♀️ Yoga Class (in 1h 45m)` or `🟢 Now · Team Standup`).
+- **Today's Schedule Modal Sheet**: Clicking **OK / Center** on the chip opens a frosted tvOS modal sheet displaying today's agenda with calendar color accents, exact time ranges, locations, and live status badges (`DONE`, `NOW`, `IN 1H`).
+- **Zero-Setup Native Sync**: Reads directly from Android's local `CalendarContract` ContentProvider. Synchronized in the background by Google Play Services without needing OAuth keys or network requests on the launcher.
+- **Instant Reactive Updates**: Listens to system calendar modifications via `ContentObserver` and the 1-minute clock tick.
+
+### 4. 🖼️ Built-in Curated 4K Wallpaper Pack & Picker
 - **31 bundled 4K wallpapers** included in `wallpapers/` (mountain lakes, misty forests, deep space, fuji morning, aurora lights, zen stones, yosemite valley, cosmic auroras, and sunsets).
 - **Automatic rotation**: Cycles through `/sdcard/Wallpapers` every 30 minutes.
 - **Android 14 Scoped Storage Support**: Full compatibility with Android 14 (SDK 34) storage permissions (`MANAGE_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`) and app-scoped storage fallback.
@@ -31,27 +37,27 @@ Tested and optimized for **TCL T6D** (Android 14 Google TV, Realtek G14) and **X
 - **Photo Screensaver**: The built-in drifting Clock screensaver cycles through the wallpaper folder behind a dim veil.
 - **One-command upload**: Push all bundled wallpapers to your TV using `tools/push-wallpapers.sh`.
 
-### 4. 🧹 Clean App Grid & Play Store Discovery
+### 5. 🧹 Clean App Grid & Play Store Discovery
 - **Streamlined App Dock**: Minimal app dock featuring your favorite streaming apps (Nuvio, SmartTube, TubPlayer, Google Play Store).
 - **Hidden Redundant Tiles**: Clean `hidden_apps` configuration keeps system utilities (Health Connect, Quick Panel, Screen Mirroring, Settings) off the main home screen while keeping them fully accessible.
 - **Automatic App Discovery**: Dynamically detects new apps installed from the Google Play Store and places them directly on the home screen.
 
-### 5. ⚙️ App Management Menu (Long-Press Context Sheet)
+### 6. ⚙️ App Management Menu (Long-Press Context Sheet)
 - Holding **OK / Center** on any app tile opens an action sheet:
   - 📌 **Move to Front**: Pin favorite app to slot 1 in the dock.
   - ⬅️ **Move Left** / ➡️ **Move Right**: Reorder tiles dynamically. Order persists automatically in `SharedPreferences`.
   - ℹ️ **App Info**: Direct shortcut into Android system app settings (clear cache, storage, permissions).
   - 🗑️ **Uninstall**: Direct system uninstallation dialog.
 
-### 6. 🪟 tvOS Frosted Glass Styling
+### 7. 🪟 tvOS Frosted Glass Styling
 - Upgraded `glass_panel.xml` with deep dark vibrancy, specular light gradients, and glowing borders.
 - 8-column layout designed for modern widescreen TV viewing without intrusive dock bands.
 - Top status pill with clock, date, HDMI Inputs, Wi-Fi status, and Settings shortcut.
 
-### 7. 🚀 Automated Wi-Fi Build & Deployment
+### 8. 🚀 Automated Wi-Fi Build & Deployment
 - `launcher/build-and-install.sh` builds and pushes `com.sdevs.tvhome`.
 - Automatically detects Android Studio JBR / OpenJDK 17.
-- Automatically grants all necessary permissions (`ACCESS_FINE_LOCATION`, `MANAGE_EXTERNAL_STORAGE`, `READ_TV_LISTINGS`, `READ_EPG_DATA`, `WRITE_EPG_DATA`, `WRITE_SECURE_SETTINGS`).
+- Automatically grants all necessary permissions (`ACCESS_FINE_LOCATION`, `MANAGE_EXTERNAL_STORAGE`, `READ_CALENDAR`, `READ_TV_LISTINGS`, `READ_EPG_DATA`, `WRITE_EPG_DATA`, `WRITE_SECURE_SETTINGS`).
 - Sets up `HomeKeyService` accessibility service and verifies launcher handover.
 
 ---
@@ -64,11 +70,13 @@ Tested and optimized for **TCL T6D** (Android 14 Google TV, Realtek G14) and **X
   <img src="docs/tcl-t6d/launcher-hero.jpg" alt="CleanYourTV on TCL T6D - Continue Watching & Clean Dock" width="850">
 </p>
 
-*Top Shelf Continue Watching integrating with Nuvio, custom 4K landscape wallpaper, and clean dock with SmartTube, Nuvio, TubPlayer, Play Store, and Wallpaper Picker.*
+*Top Shelf Continue Watching integrating with Nuvio, Google Calendar live agenda chip under the clock, 4K landscape wallpaper, and dock with SmartTube, Nuvio, TubPlayer, Play Store, and Wallpaper Picker.*
 
 <p align="center">
-  <img src="docs/tcl-t6d/launcher-apps.jpg" alt="CleanYourTV on TCL T6D - Full Wallpaper View" width="850">
+  <img src="docs/tcl-t6d/calendar-dialog.jpg" alt="CleanYourTV Today's Agenda Dialog" width="850">
 </p>
+
+*Today's Schedule modal sheet opened by clicking the Calendar chip, showing time slots, calendar color accents, event locations, and live status badges.*
 
 ---
 

@@ -97,6 +97,7 @@ fi
 printf '%s\n' \
   "pm grant com.sdevs.tvhome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted" \
   "pm grant com.sdevs.tvhome android.permission.READ_EXTERNAL_STORAGE 2>/dev/null; echo storage-granted" \
+  "pm grant com.sdevs.tvhome android.permission.READ_CALENDAR 2>/dev/null; echo calendar-granted" \
   "pm grant com.sdevs.tvhome android.permission.READ_TV_LISTINGS 2>/dev/null; echo tv-listings-granted" \
   "pm grant com.sdevs.tvhome com.android.providers.tv.permission.READ_EPG_DATA 2>/dev/null; echo epg-granted" \
   "pm grant com.sdevs.tvhome com.android.providers.tv.permission.WRITE_EPG_DATA 2>/dev/null; echo epg-write-granted" \

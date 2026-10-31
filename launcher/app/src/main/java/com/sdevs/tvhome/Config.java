@@ -78,6 +78,8 @@ final class Config {
     final PrayerTimes.Place prayerPlace;
     final int hijriOffsetDays;
     final boolean dreamPrayer;
+    /** Whether the Google Calendar agenda chip is enabled on the home screen. */
+    public final boolean calendarChip;
     /** Whether the overlay file was present and parsed. */
     final boolean overlayApplied;
 
@@ -88,7 +90,7 @@ final class Config {
                    boolean showHomeSettingsShortcut, int backgroundColor, int skyIntensity,
                    File wallpaper, File wallpaperFolder, int wallpaperRotateMinutes,
                    boolean dreamPhotos, int dreamPhotoMinutes, PrayerTimes.Place prayerPlace, int hijriOffsetDays,
-                   boolean dreamPrayer, boolean overlayApplied) {
+                   boolean dreamPrayer, boolean calendarChip, boolean overlayApplied) {
         this.dockApps = Collections.unmodifiableList(dockApps);
         this.hiddenApps = Collections.unmodifiableList(hiddenApps);
         this.liveTvPackage = liveTvPackage;
@@ -117,6 +119,7 @@ final class Config {
         this.prayerTimes = prayerPlace != null;
         this.hijriOffsetDays = hijriOffsetDays;
         this.dreamPrayer = dreamPrayer && prayerPlace != null;
+        this.calendarChip = calendarChip;
         this.overlayApplied = overlayApplied;
     }
 
@@ -158,6 +161,7 @@ final class Config {
         int asrFactor = res.getInteger(R.integer.prayer_asr_factor);
         int hijriOffset = res.getInteger(R.integer.hijri_offset_days);
         boolean dreamPrayer = res.getBoolean(R.bool.dream_prayer);
+        boolean calendarChip = res.getBoolean(R.bool.calendar_chip);
         int background = 0xFF000000;
         int skyIntensity = res.getInteger(R.integer.sky_intensity);
         boolean applied = false;
@@ -199,6 +203,7 @@ final class Config {
             asrFactor = integer(json, "prayer_asr_factor", asrFactor, 1, 2);
             hijriOffset = integer(json, "hijri_offset_days", hijriOffset, -3, 3);
             dreamPrayer = bool(json, "dream_prayer", dreamPrayer);
+            calendarChip = bool(json, "calendar_chip", calendarChip);
             skyIntensity = integer(json, "sky_intensity", skyIntensity, 0, 100);
         }
         // A theme push or reset invalidates choices made on the TV. On first use, remember the
@@ -221,7 +226,7 @@ final class Config {
                 wallpaperFolder.isEmpty() ? null : new File(wallpaperFolder), Math.max(0, rotateMinutes),
                 dreamPhotos, Math.max(1, dreamPhotoMinutes),
                 prayer ? PrayerTimes.Place.parse(prayerCity, prayerLat, prayerLon, prayerZone, fajrAngle, ishaAngle, asrFactor) : null,
-                hijriOffset, dreamPrayer, applied);
+                hijriOffset, dreamPrayer, calendarChip, applied);
     }
 
     private static void syncThemeChoices(SharedPreferences choices, File dir, File config) {
