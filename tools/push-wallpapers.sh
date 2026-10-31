@@ -14,6 +14,8 @@ echo "Creating /sdcard/Wallpapers on TV ($TV_HOST)..."
 if command -v adb >/dev/null 2>&1 && adb connect "$TV_HOST:5555" 2>&1 | grep -qE "connected to|already connected"; then
   echo "Pushing wallpapers via adb..."
   adb -s "$TV_HOST:5555" push wallpapers/*.jpg /sdcard/Wallpapers/
+  adb -s "$TV_HOST:5555" shell "mkdir -p /sdcard/Android/data/com.sdevs.tvhome/files/Wallpapers" 2>/dev/null || true
+  adb -s "$TV_HOST:5555" push wallpapers/*.jpg /sdcard/Android/data/com.sdevs.tvhome/files/Wallpapers/ 2>/dev/null || true
 else
   echo "Pushing wallpapers via fallback stream..."
   for f in wallpapers/*.jpg; do

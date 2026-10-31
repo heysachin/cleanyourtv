@@ -6,7 +6,7 @@
 
 A hyper-clean, fluid, ad-free Android TV / Google TV home screen built for peak performance and aesthetics. Forked from [Gathin23/cleanyourtv](https://github.com/Gathin23/cleanyourtv) and [Alafazam/cleanyourtv](https://github.com/Alafazam/cleanyourtv), tailored and enhanced by [@heysachin](https://github.com/heysachin).
 
-Tested and optimized for **Xiaomi MiTV-AXSO2** (Android TV 9, MediaTek UHD), and compatible with Android TV 8+ and Google TV devices.
+Tested and optimized for **TCL T6D** (Android 14 Google TV, Realtek G14) and **Xiaomi MiTV-AXSO2** (Android TV 9, MediaTek UHD), and compatible with Android TV 8+ and Google TV devices.
 
 ---
 
@@ -23,30 +23,52 @@ Tested and optimized for **Xiaomi MiTV-AXSO2** (Android TV 9, MediaTek UHD), and
   - **Prime Video Button** ➔ **Nuvio** (`com.nuvio.tv`)
 - Multi-layer capture combines intent filtering (`ButtonInterceptActivity`) with accessibility hardware scancode & window state routing (`HomeKeyService`), bypassing stock vendor overrides.
 
-### 3. ⚙️ App Management Menu (Long-Press Context Sheet)
+### 3. 🖼️ Built-in Curated 4K Wallpaper Pack & Picker
+- **31 bundled 4K wallpapers** included in `wallpapers/` (mountain lakes, misty forests, deep space, fuji morning, aurora lights, zen stones, yosemite valley, cosmic auroras, and sunsets).
+- **Automatic rotation**: Cycles through `/sdcard/Wallpapers` every 30 minutes.
+- **Android 14 Scoped Storage Support**: Full compatibility with Android 14 (SDK 34) storage permissions (`MANAGE_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`) and app-scoped storage fallback.
+- **Wallpaper Picker Tile**: On-screen tile in the grid lets you preview thumbnails and pick a wallpaper instantly.
+- **Photo Screensaver**: The built-in drifting Clock screensaver cycles through the wallpaper folder behind a dim veil.
+- **One-command upload**: Push all bundled wallpapers to your TV using `tools/push-wallpapers.sh`.
+
+### 4. 🧹 Clean App Grid & Play Store Discovery
+- **Streamlined App Dock**: Minimal app dock featuring your favorite streaming apps (Nuvio, SmartTube, TubPlayer, Google Play Store).
+- **Hidden Redundant Tiles**: Clean `hidden_apps` configuration keeps system utilities (Health Connect, Quick Panel, Screen Mirroring, Settings) off the main home screen while keeping them fully accessible.
+- **Automatic App Discovery**: Dynamically detects new apps installed from the Google Play Store and places them directly on the home screen.
+
+### 5. ⚙️ App Management Menu (Long-Press Context Sheet)
 - Holding **OK / Center** on any app tile opens an action sheet:
   - 📌 **Move to Front**: Pin favorite app to slot 1 in the dock.
   - ⬅️ **Move Left** / ➡️ **Move Right**: Reorder tiles dynamically. Order persists automatically in `SharedPreferences`.
   - ℹ️ **App Info**: Direct shortcut into Android system app settings (clear cache, storage, permissions).
   - 🗑️ **Uninstall**: Direct system uninstallation dialog.
 
-### 4. 🖼️ Built-in Curated 4K Wallpaper Pack & Picker
-- **27 bundled wallpapers** included in `wallpapers/` (mountain lakes, misty forests, deep space, fuji morning, aurora lights, zen stones, and sunsets).
-- **Automatic rotation**: Cycles through `/sdcard/Wallpapers` every 30 minutes.
-- **Wallpaper Picker Tile**: On-screen tile in the grid lets you preview thumbnails and pick a wallpaper instantly.
-- **Photo Screensaver**: The built-in drifting Clock screensaver cycles through the wallpaper folder behind a dim veil.
-- **One-command upload**: Push all bundled wallpapers to your TV using `tools/push-wallpapers.sh`.
-
-### 5. 🪟 tvOS Frosted Glass Styling
+### 6. 🪟 tvOS Frosted Glass Styling
 - Upgraded `glass_panel.xml` with deep dark vibrancy, specular light gradients, and glowing borders.
 - 8-column layout designed for modern widescreen TV viewing without intrusive dock bands.
-- Prayer times disabled by default for minimal, distraction-free viewing.
+- Top status pill with clock, date, HDMI Inputs, Wi-Fi status, and Settings shortcut.
 
-### 6. 🚀 Automated Wi-Fi Build & Deployment
+### 7. 🚀 Automated Wi-Fi Build & Deployment
 - `launcher/build-and-install.sh` builds and pushes `com.sdevs.tvhome`.
 - Automatically detects Android Studio JBR / OpenJDK 17.
-- Automatically grants all necessary permissions (`ACCESS_FINE_LOCATION`, `READ_EXTERNAL_STORAGE`, `READ_TV_LISTINGS`, `READ_EPG_DATA`, `WRITE_EPG_DATA`, `WRITE_SECURE_SETTINGS`).
+- Automatically grants all necessary permissions (`ACCESS_FINE_LOCATION`, `MANAGE_EXTERNAL_STORAGE`, `READ_TV_LISTINGS`, `READ_EPG_DATA`, `WRITE_EPG_DATA`, `WRITE_SECURE_SETTINGS`).
 - Sets up `HomeKeyService` accessibility service and verifies launcher handover.
+
+---
+
+## 📸 Screenshots
+
+### Live on TCL T6D (Android 14 Google TV)
+
+<p align="center">
+  <img src="docs/tcl-t6d/launcher-hero.jpg" alt="CleanYourTV on TCL T6D - Continue Watching & Clean Dock" width="850">
+</p>
+
+*Top Shelf Continue Watching integrating with Nuvio, custom 4K landscape wallpaper, and clean dock with SmartTube, Nuvio, TubPlayer, Play Store, and Wallpaper Picker.*
+
+<p align="center">
+  <img src="docs/tcl-t6d/launcher-apps.jpg" alt="CleanYourTV on TCL T6D - Full Wallpaper View" width="850">
+</p>
 
 ---
 
@@ -55,22 +77,42 @@ Tested and optimized for **Xiaomi MiTV-AXSO2** (Android TV 9, MediaTek UHD), and
 ### 1. Build and install over Wi-Fi
 Set your TV's IP address and run:
 ```bash
-TV_HOST=192.168.1.50 launcher/build-and-install.sh
+TV_HOST=192.168.1.128 launcher/build-and-install.sh
 ```
 
 ### 2. Push the bundled 4K wallpapers
 ```bash
-TV_HOST=192.168.1.50 tools/push-wallpapers.sh
+TV_HOST=192.168.1.128 tools/push-wallpapers.sh
 ```
 
-### 3. Debloat stock ads (optional, for Xiaomi MiTV-AXSO2)
+### 3. Debloat stock ads & bloatware
+
+**For TCL T6D (Android 14 Google TV):**
+```bash
+TV_HOST=192.168.1.128 tools/disable.sh examples/tcl-t6d/debloat.txt
+```
+
+**For Xiaomi MiTV-AXSO2 (Android TV 9):**
 ```bash
 TV_HOST=192.168.1.50 tools/disable.sh examples/xiaomi-mitv-axso2/debloat.txt
 ```
 
 ---
 
-## Before and after on Xiaomi MiTV-AXSO2
+## Comparison: TCL T6D (Android 14 Google TV)
+
+| | Before (Stock Google TV) | After (CleanYourTV `com.sdevs.tvhome`) |
+|---|---|---|
+| **Home Screen** | Sponsored video ads, recommendation rows, FAST channels | Ad-free Apple TV glass UI, Continue Watching top shelf |
+| **Packages Disabled** | 0 | 30 manufacturer promos, trackers & bloatware ([list](examples/tcl-t6d/debloat.txt)) |
+| **Ad-Blocking DNS** | Default ISP DNS | System-wide Private DNS via AdGuard (`dns.adguard-dns.com`) |
+| **Wallpaper** | Fixed stock ambient | 31 curated 4K wallpapers rotating every 30 mins + picker tile |
+| **Remote Remap** | Locked to Netflix & Prime Video | Remapped to SmartTube and Nuvio via `HomeKeyService` |
+| **Launcher Footprint** | Bloated Google TV launcherx | Ultralight 355 KB standalone APK |
+
+---
+
+## Comparison: Xiaomi MiTV-AXSO2
 
 | Before: stock home | After: this launcher |
 |---|---|
@@ -84,11 +126,7 @@ TV_HOST=192.168.1.50 tools/disable.sh examples/xiaomi-mitv-axso2/debloat.txt
 | Home screen | Google's stock launcher and PatchWall | This launcher (`com.sdevs.tvhome`) |
 | Wallpaper | None | 27 curated 4K photos rotating every 30 minutes, picked from a tile |
 
-| Wallpaper tile | Wallpaper pop-up |
-|---|---|
-| ![The Wallpaper tile at the end of the app grid](docs/axso2-fork/tile.jpg) | ![Twelve thumbnails, the current one marked Now](docs/axso2-fork/picker.jpg) |
-
-How it works, its settings and photo credits: [docs/axso2-fork](docs/axso2-fork/README.md).
+How it works, its settings and photo credits: [docs/axso2-fork](docs/axso2-fork/README.md) and [examples/tcl-t6d](examples/tcl-t6d/README.md).
 Upstream: listed in [SHOWCASE.md](https://github.com/Gathin23/cleanyourtv/blob/main/SHOWCASE.md)
 ([#204](https://github.com/Gathin23/cleanyourtv/pull/204)); TV list in
 [#260](https://github.com/Gathin23/cleanyourtv/pull/260).
