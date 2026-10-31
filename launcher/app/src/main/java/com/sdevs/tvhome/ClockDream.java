@@ -102,9 +102,10 @@ public class ClockDream extends DreamService {
             findViewById(R.id.dreamDate).setVisibility(View.GONE);   // the prayer view shows the date and Hijri date
             bindPrayer();
         }
-        List<WallpaperRotation.Picture> listed = cfg.dreamPhotos ? WallpaperFolder.list(cfg.wallpaperFolder) : null;
+        File dreamFolder = WallpaperFolder.resolveFolder(cfg.wallpaperFolder);
+        List<WallpaperRotation.Picture> listed = cfg.dreamPhotos ? WallpaperFolder.list(dreamFolder) : null;
         if (listed != null && !listed.isEmpty()) {
-            folder = cfg.wallpaperFolder;
+            folder = dreamFolder;
             pictures = listed;
             photoMinutes = cfg.dreamPhotoMinutes;
             shownPhoto = WallpaperFolder.load(this).current;   // start after the current wallpaper

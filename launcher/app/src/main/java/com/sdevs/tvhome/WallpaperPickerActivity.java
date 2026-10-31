@@ -44,7 +44,7 @@ public class WallpaperPickerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallpaper_picker);
         Config cfg = Config.load(this);
-        folder = cfg.wallpaperFolder;
+        folder = WallpaperFolder.resolveFolder(cfg.wallpaperFolder);
         List<WallpaperRotation.Picture> listed = WallpaperFolder.list(folder);
         if (listed != null) pictures = listed;
 

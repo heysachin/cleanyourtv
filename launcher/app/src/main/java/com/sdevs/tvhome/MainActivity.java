@@ -494,12 +494,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     /** The folder picture to show now, with the rotation state saved; null when there is none. */
     private File pickFolderWallpaper() {
-        List<WallpaperRotation.Picture> pictures = WallpaperFolder.list(wallpaperFolder);
-        if (pictures == null) return null;
+        File folder = WallpaperFolder.resolveFolder(wallpaperFolder);
+        List<WallpaperRotation.Picture> pictures = WallpaperFolder.list(folder);
+        if (pictures == null || pictures.isEmpty()) return null;
         WallpaperRotation.State state = WallpaperRotation.choose(
                 pictures, WallpaperFolder.load(this), System.currentTimeMillis(), wallpaperRotateMs);
         WallpaperFolder.save(this, state);
-        return state.current != null ? new File(wallpaperFolder, state.current) : null;
+        return state.current != null ? new File(folder, state.current) : null;
     }
 
     /**

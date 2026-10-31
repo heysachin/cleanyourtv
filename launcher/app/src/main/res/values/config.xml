@@ -26,6 +26,10 @@
         <item>com.mitv.tvhome.atv</item>
         <item>com.google.android.apps.tv.launcherx</item>
         <item>com.google.android.tungsten.setupwraith</item>
+        <item>com.android.healthconnect.controller</item>
+        <item>com.tcl.suspension</item>
+        <item>com.tcl.miracast</item>
+        <item>com.android.tv.settings</item>
     </string-array>
 
     <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->

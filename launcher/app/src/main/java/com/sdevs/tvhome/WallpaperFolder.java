@@ -28,12 +28,27 @@ final class WallpaperFolder {
     private WallpaperFolder() {
     }
 
+    /** Resolves the wallpaper folder with fallback to app-specific external storage for Android 11+ scoped storage. */
+    static File resolveFolder(File configured) {
+        if (configured != null) {
+            File[] files = configured.listFiles(f -> f.isFile() && f.length() > 0 && isPicture(f.getName()));
+            if (files != null && files.length > 0) return configured;
+        }
+        File alt = new File("/sdcard/Android/data/com.sdevs.tvhome/files/Wallpapers");
+        if (alt.exists()) {
+            File[] files = alt.listFiles(f -> f.isFile() && f.length() > 0 && isPicture(f.getName()));
+            if (files != null && files.length > 0) return alt;
+        }
+        return configured;
+    }
+
     /** The pictures in the folder, sorted by name; null when the folder is not set or cannot be read. */
     static List<WallpaperRotation.Picture> list(File folder) {
         if (folder == null) return null;
-        File[] files = folder.listFiles(f -> f.isFile() && f.length() > 0 && isPicture(f.getName()));
+        File target = resolveFolder(folder);
+        File[] files = target.listFiles(f -> f.isFile() && f.length() > 0 && isPicture(f.getName()));
         if (files == null) {
-            Log.w(TAG, "cannot read " + folder + " (missing folder or READ_EXTERNAL_STORAGE)");
+            Log.w(TAG, "cannot read " + target + " (missing folder or permissions)");
             return null;
         }
         List<WallpaperRotation.Picture> pictures = new ArrayList<>();
